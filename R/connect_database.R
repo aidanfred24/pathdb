@@ -7,38 +7,100 @@
 #'
 #' @returns SQLite connection to the downloaded file
 #' @export
+#' @examplesIf interactive() && curl::has_internet()
+#' # Connect to organism information database
+#' conn <- connect_database()
+#'
+#' # Query information using connection
+#' x <- DBI::dbGetQuery(
+#'   conn = conn,
+#'   statement = "select * from orgInfo;"
+#'   )
+#' head(x)
+#'
+#' # Disconnect from database file
+#' DBI::dbDisconnect(conn = conn)
+#'
+#' # Connect to species information database (e.g. Indian Cobra)
+#' conn <- connect_database(species_id = 99)
+#'
+#' # Query information using connection
+#' x <- DBI::dbGetQuery(
+#'   conn = conn,
+#'   statement = "select * from geneInfo;"
+#'   )
+#' head(x)
+#'
+#' # Disconnect from database file
+#' DBI::dbDisconnect(conn = conn)
+#'
 #'
 connect_database <- function(species_id = NULL){
 
     # define where database is located
     db_ver <- "data113"
-    db_url <- "http://bioinformatics.sdstate.edu/data/"
+    db_url <- "https://bioinformatics.sdstate.edu/data/"
 
     # if environmental variable is not set, use relative path
     DATAPATH <- Sys.getenv("IDEP_DATABASE")[1]
-    # if not defined in the environment, use too levels above
+    # if not defined in the environment, use user directory
     if (nchar(DATAPATH) == 0) {
-        DATAPATH <- paste0("../../data/")
+        DATAPATH <- tools::R_user_dir("pathdb", which = "cache")
     }
-    #Add version
-    DATAPATH <- paste0(DATAPATH, "/", db_ver, "/")
-    org_info_file <- paste0(DATAPATH, "demo/orgInfo.db")
-    if(!file.exists(org_info_file)) {
-        DATAPATH <- paste0("./", db_ver, "/")
-        org_info_file <- paste0(DATAPATH, "demo/orgInfo.db")
+
+    # create cache
+    if (!dir.exists(DATAPATH)){
+        dir.create(DATAPATH, recursive = TRUE)
     }
+
+    # Organism info file
+    org_info_file <- paste0(DATAPATH, "/orgInfo.db")
+    db_file <- org_info_file
+
     # Download file from path
     if (!file.exists(org_info_file)) {
-            file_name <- paste0(db_ver, ".tar.gz")
-            options(timeout = 3000)
-            download.file(
-                url = paste0(db_url, db_ver, "/", file_name),
-                destfile = file_name,
-                mode = "wb",
-                quiet = FALSE
-            )
-            untar(file_name) # untar and unzip the files
-            file.remove(file_name) # delete the tar file to save storage
+
+        # Create temporary directory for initial installation
+        temp <- tempfile()
+        dir.create(temp)
+
+        file_name <- paste0(db_ver, ".tar.gz")
+        options(timeout = 3000)
+        # Attempt to download, warn if unable
+        tryCatch(
+            suppressWarnings(
+                download.file(
+                    url = paste0(db_url, db_ver, "/", file_name),
+                    destfile = paste0(temp, "/", file_name),
+                    mode = "wb",
+                    quiet = FALSE
+                )
+            ),
+            error = function(e){
+                if (grepl("cannot open URL", e$message)){
+                    stop("Cannot find database file locally",
+                         " or open database URL for download.",
+                         " Please verify internet connection and retry.")
+                } else {
+                    stop("Unknown error occured.",
+                         " Please report error to development team")
+                }
+            }
+        )
+        # untar and unzip the files
+        untar(paste0(temp, "/", file_name),
+              files = paste0(db_ver, "/demo/orgInfo.db"),
+              exdir = temp)
+        # delete the tar file to save storage
+        file.remove(paste0(temp, "/", file_name))
+
+        # Move file to permanent cache
+        file.copy(from = paste0(temp, "/", db_ver, "/demo/orgInfo.db"),
+                  to = DATAPATH,
+                  recursive = TRUE)
+
+        # Remove temporary files
+        unlink(temp, recursive = TRUE)
     }
 
     # Specific species selected
@@ -61,33 +123,44 @@ connect_database <- function(species_id = NULL){
 
         # Return error message if species not found
         if (is.null(nrow(file)) || nrow(file) == 0){
-            file <- "Species Not Found"
-            stop(file)
+            stop("Species Not Found")
         }
 
-        org_info_file <- paste0(DATAPATH, "db/", file)
-        if(!file.exists(org_info_file)) {
-            DATAPATH <- paste0("./", db_ver, "/")
-            org_info_file <- paste0(DATAPATH, "db/", file)
-        }
-        if (!file.exists(org_info_file)) {
+        db_file <- paste0(DATAPATH, "/", file)
+
+        if (!file.exists(db_file)) {
             file_name <- paste0(file, ".gz")
             options(timeout = 3000)
-            download.file(
-                url = paste0(db_url, db_ver, "/db/", file_name),
-                destfile = paste0(org_info_file, ".gz"),
-                mode = "wb",
-                quiet = FALSE
+            # Attempt to download, warn if unable
+            tryCatch(
+                suppressWarnings(
+                    download.file(
+                        url = paste0(db_url, db_ver, "/db/", file_name),
+                        destfile = paste0(db_file, ".gz"),
+                        mode = "wb",
+                        quiet = FALSE
+                    )
+                ),
+                error = function(e){
+                    if (grepl("cannot open URL", e$message)){
+                        stop("Cannot find database file locally",
+                             " or open database URL for download.",
+                             " Please verify internet connection and retry.")
+                    } else {
+                        stop("Unknown error occured.",
+                             " Please report error to development team")
+                    }
+                }
             )
             # Unzip species database file
-            R.utils::gunzip(filename = paste0(DATAPATH, "db/", file_name),
-                            destname = org_info_file)
+            R.utils::gunzip(filename = paste0(DATAPATH, "/", file_name),
+                            destname = db_file)
         }
     }
 
     return(DBI::dbConnect(
         drv = RSQLite::dbDriver("SQLite"),
-        dbname = org_info_file,
+        dbname = db_file,
         flags = RSQLite::SQLITE_RO
     ))
 }

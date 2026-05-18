@@ -15,10 +15,15 @@
 #' @export
 #'
 search_species <- function(query,
-                         name_type = "all"){
+                           name_type = "all"){
 
     types <- setNames(c("name2", "academicName"),
                       c("primary", "academic"))
+
+    if (!name_type %in% c(names(types), "all", "id")){
+        stop("Invalid name type entered, see documentation")
+    }
+
     org <- suppressMessages(get_table())
 
     if (name_type == "id") {
@@ -41,8 +46,8 @@ search_species <- function(query,
     }
 
     if (nrow(results) == 0) {
-        results <- "Species Not Found"
-        stop(results)
+        results <- NULL
+        message("No Species Found")
     }
 
     return(results)
