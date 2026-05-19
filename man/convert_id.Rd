@@ -37,7 +37,7 @@ type. Returns \code{NULL} if \code{species_id} is missing or no matches are foun
 }
 }
 \description{
-Queries the database to map user-provided gene identifiers to Ensembl IDs. To
-ensure best matching and conversion, please verify that all gene identifiers
-have no whitespace and are at least 2 characters long.
+Queries the database to map user-provided gene identifiers to Ensembl/Entrez
+IDs. To ensure best matching and conversion, please verify that all gene
+identifiers have no whitespace and are at least 2 characters long.
 }

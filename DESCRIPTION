@@ -28,16 +28,13 @@ Encoding: UTF-8
 LazyData: true
 Language: en-US
 Imports: 
-    BiocGenerics,
     DBI,
-    DESeq2,
     dplyr,
     edgeR,
     R.utils,
     RSQLite,
     stats,
     utils,
-    SummarizedExperiment,
     tools,
     curl
 Roxygen: list(markdown = TRUE)

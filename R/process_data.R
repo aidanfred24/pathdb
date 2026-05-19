@@ -3,7 +3,8 @@
 #' Performs pre-processing, missing value imputation, filtering, and
 #' transformation on gene expression count data.
 #'
-#' @param data A numeric matrix or data frame of gene expression counts.
+#' @param data A numeric matrix or data frame (> 1 columns) of gene expression
+#' counts.
 #' @param missing_value Character. Method to handle missing values. Options:
 #'   * `"geneMedian"`: Impute using the median expression of the gene across
 #'   samples.
@@ -11,18 +12,11 @@
 #'   * `"groupMedian"`: Impute using the median of the sample group
 #'   (detected from colnames).
 #' @param min_cpm Numeric. Minimum counts per million threshold for filtering
-#' genes.
-#' @param n_min_samples_count Numeric. Minimum number of samples that must meet
+#'   genes.
+#' @param n_min_samples Numeric. Minimum number of samples that must meet
 #'   the `min_cpm` threshold for a gene to be retained.
-#' @param counts_transform Integer. Method for data transformation:
-#'   * 0 = None (Raw Counts).
-#'   * 1 = log2(CPM + `counts_log_start`)
-#'   * 2 = Variance Stabilizing Transformation (VST) via `DESeq2`.
-#'   * 3 = Regularized Log (rlog) via `DESeq2`.
-#' @param counts_log_start Numeric. Constant added to counts before log
-#' transformation. Usually between 1 and 10. Higher values reduce noise but
-#' decrease sensitivity
-#'   (used when `counts_transform = 1`).
+#' @param rescale Logical. TRUE allows for rescaling if values are exceedingly
+#'   large.
 #'
 #' @returns The processed and transformed data matrix.
 #'
@@ -42,8 +36,7 @@
 #' hypox_filtered <- process_data(data = pathdb::hypoxia_reads,
 #'                                missing_value = "geneMedian",
 #'                                min_cpm = 0.4,
-#'                                n_min_samples_count = 2,
-#'                                counts_transform = 0)
+#'                                n_min_samples = 2)
 #'
 #' # Check filtered data
 #' summary(hypox_filtered)
@@ -52,47 +45,59 @@
 process_data <- function(data,
                          missing_value = "geneMedian",
                          min_cpm = 0.5,
-                         n_min_samples_count = 1,
-                         counts_transform = 0,
-                         counts_log_start = 4) {
+                         n_min_samples = 1,
+                         rescale = FALSE) {
+
     # Check for gene ids in data frame
     if (is.data.frame(data)) {
         char_cols <- sapply(data, function(x) is.character(x) || is.factor(x))
+
         if (sum(char_cols) > 1) {
-            stop("Data frame must have only one column of character or factor (gene IDs) data.")
+            stop(paste0("Data frame must have only one column of character ",
+                        "or factor (gene IDs) data."))
+
         } else if (sum(char_cols) == 1) {
+
             # Assign gene ids to rownames
             id_col <- which(char_cols)
             rownames(data) <- trimws(as.character(data[, id_col]))
             data <- data[, !char_cols]
+
         }
     }
-    # Sort by standard deviation -----------
-    data <- data[order(-apply(
-        data[, 1:dim(data)[2]],
-        1,
-        function(x) sd(x, na.rm = TRUE)
-    )), ]
+    # Sort by standard deviation
+    data <- data[order(-apply(data[, 1:dim(data)[2], drop = FALSE],1,
+                              function(x) sd(x, na.rm = TRUE)
+    )
+    ), ]
 
-    # Missng values in expression data ----------
+    # Missing values in expression data
     if (sum(is.na(data)) > 0) {
+        # Check param
         if (missing_value == "geneMedian") {
+            # Get row medians
             row_medians <- apply(data, 1, function(y) median(y, na.rm = T))
+            # Find missing vals in each column, replace with respective median
             for (i in 1:ncol(data)) {
                 val_miss_row <- which(is.na(data[, i]))
                 data[val_miss_row, i] <- row_medians[val_miss_row]
             }
         } else if (missing_value == "treatAsZero") {
+            # Enter 0 for any NA
             data[is.na(data)] <- 0
         } else if (missing_value == "groupMedian") {
+            # Detect column names in same experimental group
             sample_groups <- detect_groups(colnames(data))
+
             for (group in unique(sample_groups)) {
                 samples <- which(sample_groups == group)
+                # Row medians of sample group
                 row_medians <- apply(
                     data[, samples, drop = F],
                     1,
                     function(y) median(y, na.rm = T)
                 )
+                # Find missing vals in each column, replace with group median
                 for (i in samples) {
                     missing <- which(is.na(data[, i]))
                     if (length(missing) > 0) {
@@ -100,6 +105,7 @@ process_data <- function(data,
                     }
                 }
             }
+            # If any NAs left, replace with row median
             if (sum(is.na(data)) > 0) {
                 row_medians <- apply(
                     data,
@@ -120,57 +126,38 @@ process_data <- function(data,
         return(as.matrix(data))
     }
 
-
-    data <- data[which(apply(
-        edgeR::cpm(edgeR::DGEList(counts = data)),
-        1,
-        function(y) sum(y >= min_cpm)
-    ) >= n_min_samples_count), ]
+    # Find data with cpm > min_cpm
+    data <- data[which(
+        apply(edgeR::cpm(edgeR::DGEList(counts = data)),
+              1,
+              function(y) sum(y >= min_cpm)
+        ) >= n_min_samples), ]
 
     if (max(data) > 2e9) {
-        scale_factor <- max(data) / (2^32 - 1)
-        # round up scale_factor to the nearest integer
-        scale_factor <- ceiling(scale_factor / 10 + 1) * 10 #  just to be safe.
-        # divide by scale factor and round to the nearest integer, for the entire matrix, data
-        data <- round(data / scale_factor)
-    }
 
+        if (rescale){
+            # ratio of max data (problematic value) to largest integer
+            scale_factor <- max(data) / (2^32 - 1)
+            # round up scale_factor to the nearest integer
+            scale_factor <- ceiling(scale_factor / 10 + 1) * 10
+            # divide by scale factor and round to the nearest integer,
+            # for the entire matrix,
+            data <- round(data / scale_factor)
 
-    # Construct DESeqExpression Object ----------
-    if (counts_transform != 0) {
-        tem <- rep("A", dim(data)[2])
-        tem[1] <- "B"
-        col_data <- cbind(colnames(data), tem)
-        colnames(col_data) <- c("sample", "groups")
+            message(paste0("Count data rescaled/divided by ", scale_factor,
+                           " and rounded to nearest integer"))
 
-        dds <- DESeq2::DESeqDataSetFromMatrix(
-            countData = data,
-            colData = col_data,
-            design = ~groups
-        )
-        dds <- DESeq2::estimateSizeFactors(dds)
-
-        # Counts Transformation ------------
-        if (counts_transform == 3) {
-            data <- DESeq2::rlog(dds, blind = TRUE)
-            data <- SummarizedExperiment::assay(data)
-        } else if (counts_transform == 2) {
-            data <- DESeq2::vst(dds, blind = TRUE)
-            data <- SummarizedExperiment::assay(data)
         } else {
-            data <- log2(BiocGenerics::counts(
-                dds,
-                normalized = TRUE
-            ) + counts_log_start)
+            message(paste0("Data contains values greater than 2 billion.",
+                           " Values of this size may raise integer overflow",
+                           " related errors for other packages. Not required,",
+                           " but consider rescaling values with",
+                           " rescale = TRUE"))
         }
     }
 
-
-    data <- data[order(-apply(
-        data[, 1:dim(data)[2]],
-        1,
-        sd
-    )), ]
+    # Sort by row standard deviation
+    data <- data[order(-apply(data[, 1:dim(data)[2], drop = FALSE], 1, sd)), ]
 
     return(as.matrix(data))
 }
