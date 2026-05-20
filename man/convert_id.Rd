@@ -41,3 +41,38 @@ Queries the database to map user-provided gene identifiers to Ensembl/Entrez
 IDs. To ensure best matching and conversion, please verify that all gene
 identifiers have no whitespace and are at least 2 characters long.
 }
+\examples{
+\dontshow{if (interactive() && curl::has_internet()) withAutoprint(\{ # examplesIf}
+# CAUTION: The human database is very large, running these examples require
+# the download of the human database.
+
+# View our experimental gene IDs
+head(rownames(hypoxia_reads))
+
+# Convert IDs to Ensembl format for further analysis
+ens_conv <- convert_id(genes = rownames(hypoxia_reads),
+                       species_id = 96)
+
+# Yields a conversion table for our genes
+head(ens_conv)
+
+# Can also convert to Entrez IDs, if needed
+entrez_conv <- convert_id(genes = rownames(hypoxia_reads),
+                          species_id = 96,
+                          id_type = "entrez")
+
+# Yields a conversion table for our genes
+head(entrez_conv)
+
+# We want to automatically convert our IDs within our data
+ens_hypoxia <- convert_id(genes = rownames(hypoxia_reads),
+                          species_id = 96,
+                          data = hypoxia_reads)
+
+# Original data
+head(hypoxia_reads)
+
+# Converted data
+head(ens_hypoxia)
+\dontshow{\}) # examplesIf}
+}

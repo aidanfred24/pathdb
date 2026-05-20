@@ -15,6 +15,20 @@
 #'
 #' @md
 #' @export
+#'
+#' @examplesIf interactive() && curl::has_internet()
+#' # CAUTION: The human database is very large, running these examples require
+#' # the download of the human database.
+#'
+#' # Prepare background genes mapping for Hypoxia dataset
+#' # Useful for pathway enrichment analysis of our data
+#' bg_genes <- T2G_prep(
+#'   species_id = 96,
+#'   category = "KEGG",
+#'   genes = rownames(hypoxia_deseq)
+#' )
+#' head(bg_genes)
+#'
 T2G_prep <- function(species_id = NULL,
                      category = "GOBP",
                      genes = NULL) {
@@ -25,12 +39,12 @@ T2G_prep <- function(species_id = NULL,
                             category = category)
 
     if (nrow(path_map) == 0) {
-        DBI::dbDisconnect(conn)
         warning("No pathways found for the given criteria")
         return(NULL)
     }
 
     conn <- connect_database(species_id = species_id)
+    on.exit(DBI::dbDisconnect(conn))
     # Retrieve Pathway Info
     # Query unique pathway information
     pathway_ids <- unique(path_map$pathwayID)
@@ -39,8 +53,6 @@ T2G_prep <- function(species_id = NULL,
                            ");")
 
     pathways <- DBI::dbGetQuery(conn, statement = pathways_sql)
-
-    DBI::dbDisconnect(conn)
 
     # Ensure same data type between tables
     path_map$pathwayID <- as.character(path_map$pathwayID)

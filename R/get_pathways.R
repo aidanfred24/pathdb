@@ -22,6 +22,19 @@
 #' with pathway metadata.
 #' @md
 #' @export
+#'
+#' @examplesIf interactive() && curl::has_internet()
+#' # CAUTION: The human database is very large, running these examples require
+#' # the download of the human database.
+#'
+#' # Get GOBP pathways for our genes of interest
+#' path_info <- get_pathways(
+#'   species_id = 96,
+#'   genes = rownames(hypoxia_reads),
+#'   category = "GOBP"
+#' )
+#' head(path_info)
+#'
 get_pathways <- function(species_id,
                          genes = NULL,
                          category = "GOBP") {

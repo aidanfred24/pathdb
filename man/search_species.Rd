@@ -24,3 +24,18 @@ Throws an error if no species are found.
 \description{
 Searches the organism database for species matching a query string.
 }
+\examples{
+\dontshow{if (interactive() && curl::has_internet()) withAutoprint(\{ # examplesIf}
+# Search all names for "Human"
+search_species(query = "Human", name_type = "all")
+
+# Search primary names for "Human"
+search_species(query = "Human", name_type = "primary")
+
+# Search academic names for "Homo sapiens"
+search_species(query = "Homo sapiens", name_type = "academic")
+
+# Search by species ID
+search_species(query = 96, name_type = "id")
+\dontshow{\}) # examplesIf}
+}

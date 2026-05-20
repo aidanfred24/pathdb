@@ -14,6 +14,19 @@
 #' @md
 #' @export
 #'
+#' @examplesIf interactive() && curl::has_internet()
+#' # Search all names for "Human"
+#' search_species(query = "Human", name_type = "all")
+#'
+#' # Search primary names for "Human"
+#' search_species(query = "Human", name_type = "primary")
+#'
+#' # Search academic names for "Homo sapiens"
+#' search_species(query = "Homo sapiens", name_type = "academic")
+#'
+#' # Search by species ID
+#' search_species(query = 96, name_type = "id")
+#'
 search_species <- function(query,
                            name_type = "all"){
 
@@ -23,7 +36,7 @@ search_species <- function(query,
     if (!name_type %in% c(names(types), "all", "id")){
         stop("Invalid name type entered, see documentation")
     }
-
+    
     org <- suppressMessages(get_table())
 
     if (name_type == "id") {

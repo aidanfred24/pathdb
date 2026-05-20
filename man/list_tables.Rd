@@ -16,3 +16,9 @@ A character vector of table names available in the database connection.
 \description{
 Lists all available tables within the database for a specific species.
 }
+\examples{
+\dontshow{if (interactive() && curl::has_internet()) withAutoprint(\{ # examplesIf}
+# List all tables available for species 99 (Indian Cobra)
+list_tables(species_id = 99)
+\dontshow{\}) # examplesIf}
+}

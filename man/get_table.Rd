@@ -20,6 +20,16 @@ A data frame containing the data from the selected table.
 \description{
 Retrieves a specific table from the database for a selected species.
 }
+\examples{
+\dontshow{if (interactive() && curl::has_internet()) withAutoprint(\{ # examplesIf}
+# Retrieve geneInfo table for Indian Cobra Species
+cobra_genes <- get_table(species_id = 99,
+                         table = "geneInfo")
+
+# View table
+head(cobra_genes)
+\dontshow{\}) # examplesIf}
+}
 \seealso{
 \code{\link{list_tables}} to see available tables for a species.
 }

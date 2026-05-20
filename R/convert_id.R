@@ -24,6 +24,40 @@
 #'   * Any whitespace found in original IDs will be removed.
 #' @md
 #' @export
+#'
+#' @examplesIf interactive() && curl::has_internet()
+#' # CAUTION: The human database is very large, running these examples require
+#' # the download of the human database.
+#'
+#' # View our experimental gene IDs
+#' head(rownames(hypoxia_reads))
+#'
+#' # Convert IDs to Ensembl format for further analysis
+#' ens_conv <- convert_id(genes = rownames(hypoxia_reads),
+#'                        species_id = 96)
+#'
+#' # Yields a conversion table for our genes
+#' head(ens_conv)
+#'
+#' # Can also convert to Entrez IDs, if needed
+#' entrez_conv <- convert_id(genes = rownames(hypoxia_reads),
+#'                           species_id = 96,
+#'                           id_type = "entrez")
+#'
+#' # Yields a conversion table for our genes
+#' head(entrez_conv)
+#'
+#' # We want to automatically convert our IDs within our data
+#' ens_hypoxia <- convert_id(genes = rownames(hypoxia_reads),
+#'                           species_id = 96,
+#'                           data = hypoxia_reads)
+#'
+#' # Original data
+#' head(hypoxia_reads)
+#'
+#' # Converted data
+#' head(ens_hypoxia)
+#'
 convert_id <- function(genes,
                        data = NULL,
                        species_id,
@@ -56,6 +90,7 @@ convert_id <- function(genes,
                            "')")
 
     conn_db <- connect_database(species_id = species_id)
+    on.exit(DBI::dbDisconnect(conn_db))
 
     query_statement <- paste0(
         "select id,ens,idType from mapping where id IN ",
@@ -65,7 +100,6 @@ convert_id <- function(genes,
     result <- DBI::dbGetQuery(conn_db, query_statement)
 
     if (nrow(result) == 0) {
-        DBI::dbDisconnect(conn_db)
         message("No gene matches found")
         return(NULL)
     }
@@ -86,8 +120,6 @@ convert_id <- function(genes,
 
         result <- result[!is.na(result$entrezgene_id),]
     }
-
-    DBI::dbDisconnect(conn_db)
 
     # resolve multiple ID types, get the most matched
     best_id_type <- as.integer(

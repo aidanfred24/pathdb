@@ -10,7 +10,7 @@ Authors@R: c(
     ),
     person(
       "Xijin", "Ge",
-      email = "Xijin.Ge@sdstate,edu",
+      email = "Xijin.Ge@sdstate.edu",
       role = c("fnd")
     )
   )
@@ -35,12 +35,12 @@ Imports:
     RSQLite,
     stats,
     utils,
-    tools,
-    curl
+    tools
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 Suggests: 
     clusterProfiler,
+    curl,
     knitr,
     rmarkdown,
     testthat (>= 3.0.0)
