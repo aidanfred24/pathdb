@@ -10,7 +10,7 @@ Authors@R: c(
     ),
     person(
       "Xijin", "Ge",
-      email = "Xijin.Ge@sdstate,edu",
+      email = "Xijin.Ge@sdstate.edu",
       role = c("fnd")
     )
   )
@@ -20,26 +20,27 @@ Description: Provides access to large-scale genomics data from the South Dakota
     characteristics, and pathway mapping data from KEGG, GOBP, GOCC, and many 
     more pathway databases. Also provides various helper functions for 
     processing RNA-Seq data for differential expression analysis and pathway 
-    enrichment analysis.
+    enrichment analysis, occasionally sourced from code from iDEP, developed by
+    Ge, S.X., Son, E.W. & Yao, R. (2018) 
+    <https://doi.org/10.1186/s12859-018-2486-6>. 
 License: GPL (>= 3)
 Encoding: UTF-8
 LazyData: true
 Language: en-US
 Imports: 
-    BiocGenerics,
     DBI,
-    DESeq2,
     dplyr,
     edgeR,
     R.utils,
     RSQLite,
     stats,
     utils,
-    SummarizedExperiment
+    tools
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.3
 Suggests: 
     clusterProfiler,
+    curl,
     knitr,
     rmarkdown,
     testthat (>= 3.0.0)

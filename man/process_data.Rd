@@ -8,13 +8,13 @@ process_data(
   data,
   missing_value = "geneMedian",
   min_cpm = 0.5,
-  n_min_samples_count = 1,
-  counts_transform = 0,
-  counts_log_start = 4
+  n_min_samples = 1,
+  rescale = FALSE
 )
 }
 \arguments{
-\item{data}{A numeric matrix or data frame of gene expression counts.}
+\item{data}{A numeric matrix or data frame (> 1 columns) of gene expression
+counts.}
 
 \item{missing_value}{Character. Method to handle missing values. Options:
 \itemize{
@@ -28,21 +28,11 @@ samples.
 \item{min_cpm}{Numeric. Minimum counts per million threshold for filtering
 genes.}
 
-\item{n_min_samples_count}{Numeric. Minimum number of samples that must meet
+\item{n_min_samples}{Numeric. Minimum number of samples that must meet
 the \code{min_cpm} threshold for a gene to be retained.}
 
-\item{counts_transform}{Integer. Method for data transformation:
-\itemize{
-\item 0 = None (Raw Counts).
-\item 1 = log2(CPM + \code{counts_log_start})
-\item 2 = Variance Stabilizing Transformation (VST) via \code{DESeq2}.
-\item 3 = Regularized Log (rlog) via \code{DESeq2}.
-}}
-
-\item{counts_log_start}{Numeric. Constant added to counts before log
-transformation. Usually between 1 and 10. Higher values reduce noise but
-decrease sensitivity
-(used when \code{counts_transform = 1}).}
+\item{rescale}{Logical. TRUE allows for rescaling if values are exceedingly
+large.}
 }
 \value{
 The processed and transformed data matrix.
@@ -66,8 +56,7 @@ nrow(pathdb::hypoxia_reads)
 hypox_filtered <- process_data(data = pathdb::hypoxia_reads,
                                missing_value = "geneMedian",
                                min_cpm = 0.4,
-                               n_min_samples_count = 2,
-                               counts_transform = 0)
+                               n_min_samples = 2)
 
 # Check filtered data
 summary(hypox_filtered)

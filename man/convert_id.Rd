@@ -4,7 +4,7 @@
 \alias{convert_id}
 \title{Convert Gene IDs to Ensembl}
 \usage{
-convert_id(genes, data = NULL, species_id, max_sample_ids = 100)
+convert_id(genes, data = NULL, species_id, id_type = "ens")
 }
 \arguments{
 \item{genes}{A vector or character string of gene identifiers to convert.}
@@ -15,17 +15,64 @@ conversion results with the original data.}
 
 \item{species_id}{Numeric. The ID of the species for the database connection.}
 
-\item{max_sample_ids}{Integer. The maximum number of gene IDs to use when
-guessing the ID type (optimization parameter). Defaults to 100.}
+\item{id_type}{Character. The type of ID to convert to:
+\itemize{
+\item "ens" = Ensembl gene IDs (Default)
+\item "entrez" = Entrez gene IDs
+\itemize{
+\item WARNING: Not all species or genes have Entrez gene IDs available
+\item May take longer than Ensembl IDs
+\item Will likely have duplicate Entrez IDs
+}
+}}
 }
 \value{
 A data frame.
 \itemize{
-\item If \code{data} is \code{NULL}: Returns a mapping table with original IDs and Ensembl IDs.
-\item If \code{data} is provided: Returns \code{data} merged with the Ensembl IDs.
-Returns \code{NULL} if \code{species_id} is missing or no matches are found.
+\item If \code{data} is \code{NULL}: Returns a mapping table with original IDs and
+IDs of selected type.
+\item If \code{data} is provided: Returns \code{data} merged with the IDs of selected
+type. Returns \code{NULL} if \code{species_id} is missing or no matches are found.
+\item Any whitespace found in original IDs will be removed.
 }
 }
 \description{
-Queries the database to map user-provided gene identifiers to Ensembl IDs.
+Queries the database to map user-provided gene identifiers to Ensembl/Entrez
+IDs. To ensure best matching and conversion, please verify that all gene
+identifiers have no whitespace and are at least 2 characters long.
+}
+\examples{
+\dontshow{if (interactive() && curl::has_internet()) withAutoprint(\{ # examplesIf}
+# CAUTION: The human database is very large, running these examples require
+# the download of the human database.
+
+# View our experimental gene IDs
+head(rownames(hypoxia_reads))
+
+# Convert IDs to Ensembl format for further analysis
+ens_conv <- convert_id(genes = rownames(hypoxia_reads),
+                       species_id = 96)
+
+# Yields a conversion table for our genes
+head(ens_conv)
+
+# Can also convert to Entrez IDs, if needed
+entrez_conv <- convert_id(genes = rownames(hypoxia_reads),
+                          species_id = 96,
+                          id_type = "entrez")
+
+# Yields a conversion table for our genes
+head(entrez_conv)
+
+# We want to automatically convert our IDs within our data
+ens_hypoxia <- convert_id(genes = rownames(hypoxia_reads),
+                          species_id = 96,
+                          data = hypoxia_reads)
+
+# Original data
+head(hypoxia_reads)
+
+# Converted data
+head(ens_hypoxia)
+\dontshow{\}) # examplesIf}
 }

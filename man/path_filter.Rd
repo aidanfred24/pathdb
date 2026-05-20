@@ -25,7 +25,7 @@ one or more pathway categories (e.g., "GOBP", "KEGG"). Optionally, the results
 can be further restricted to a specific list of genes.
 }
 \examples{
-\dontrun{
+\dontshow{if (interactive() && curl::has_internet()) withAutoprint(\{ # examplesIf}
 # Get all GO Biological Process pathways for Human (ID 96)
 gobp_paths <- path_filter(species_id = 96, category = "GOBP")
 
@@ -36,5 +36,5 @@ kegg_paths <- path_filter(
     genes = rownames(hypoxia_reads)[1:100],
     category = "KEGG"
 )
-}
+\dontshow{\}) # examplesIf}
 }

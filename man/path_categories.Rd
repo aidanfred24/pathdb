@@ -17,3 +17,10 @@ Data frame of pathway categories for given species
 Retrieves pathway category options (e.g. KEGG, GOBP, etc.) for a given
 species. May take longer for well-documented species (i.e. Human)
 }
+\examples{
+\dontshow{if (interactive() && curl::has_internet()) withAutoprint(\{ # examplesIf}
+# Get pathway categories for species 99 (Indian Cobra)
+categories <- path_categories(species_id = 99)
+head(categories)
+\dontshow{\}) # examplesIf}
+}

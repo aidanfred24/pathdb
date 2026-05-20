@@ -51,7 +51,7 @@ df <- hypoxia_deseq |>
 df <- df[df$diffexp != "NO" & !is.na(df$diffexp), ]
 ```
 
-Next, to ensure our gene IDs match the standard format expected by the `pathdb` database, we can use the `convert_id` function. Here our species of interest is human (Species ID: 96).
+Next, to ensure our gene IDs match the standard format expected by the `pathdb` database, we can use the `convert_id()` function. Here our species of interest is human (Species ID: 96).
 
 ```{r convert_ids, eval=FALSE}
 # Convert ids to Ensembl format to ensure compatibility
@@ -71,7 +71,7 @@ deg_results_list <- split(df, df$diffexp)
 
 ## Preparing the TERM2GENE Mapping
 
-The `clusterProfiler` function `enricher` requires background annotation data that maps pathway categories (TERMs) to gene IDs (GENEs). With the `pathdb` package, fetching this information is streamlined using the `T2G_prep` function.
+The `clusterProfiler` function `enricher` requires background annotation data that maps pathway categories (TERMs) to gene IDs (GENEs). With the `pathdb` package, fetching this information is streamlined using the `T2G_prep()` function.
 
 We will extract the KEGG pathways mapping for all the genes in our original `hypoxia_deseq` dataset, which acts as our background universe. This feature of `pathdb` is especially versatile, as one can use a vector of pathway database names, e.g. `c("KEGG", "GOBP", "GOCC")`. In this way, we can check databases in one function call, rather than pulling from KEGG, GO, and other databases separately.
 
@@ -92,7 +92,7 @@ bg_genes <- hypoxia_T2G
 
 With our gene lists and background annotation ready, we can perform an Over-Representation Analysis (ORA). ORA determines whether known pathways (biological functions or processes) are over-represented (enriched) in an experimentally-derived gene list, such as our lists of up- and down-regulated genes.
 
-We apply the `enricher` function to both the "UP" and "DOWN" gene lists. We also set some cutoffs to ensure our results are robust.
+We apply the `enricher()` function to both the "UP" and "DOWN" gene lists. We also set some cutoffs to ensure our results are robust.
 
 ```{r run_ora}
 padj_cutoff <- 0.1
@@ -157,7 +157,7 @@ geneList <- setNames(
 geneList <- sort(geneList, decreasing = TRUE)
 ```
 
-With the ranked `geneList`, we can run the `GSEA` function from clusterProfiler. We will utilize the same background mapping (`bg_genes`) downloaded earlier.
+With the ranked `geneList`, we can run the `GSEA()` function from clusterProfiler. We will utilize the same background mapping (`bg_genes`) downloaded earlier.
 
 ```{r run_gsea, warning=FALSE}
 # Execute GSEA

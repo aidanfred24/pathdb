@@ -14,8 +14,7 @@
 #'   gene, pathway ID, and description) for the specified categories and genes.
 #' @export
 #'
-#' @examples
-#' \dontrun{
+#' @examplesIf interactive() && curl::has_internet()
 #' # Get all GO Biological Process pathways for Human (ID 96)
 #' gobp_paths <- path_filter(species_id = 96, category = "GOBP")
 #'
@@ -26,7 +25,6 @@
 #'     genes = rownames(hypoxia_reads)[1:100],
 #'     category = "KEGG"
 #' )
-#' }
 path_filter <- function(species_id,
                         genes = NULL,
                         category = "GOBP") {
@@ -37,6 +35,7 @@ path_filter <- function(species_id,
 
     # Connect to database
     conn <- connect_database(species_id = species_id)
+    on.exit(DBI::dbDisconnect(conn))
 
     # Convert genes if provided
     if (!is.null(genes)) {
@@ -75,8 +74,6 @@ path_filter <- function(species_id,
 
     # Run query
     path_map <- DBI::dbGetQuery(conn, statement = query)
-
-    DBI::dbDisconnect(conn)
 
     return(path_map)
 }

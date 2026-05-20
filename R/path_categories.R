@@ -9,6 +9,11 @@
 #' @returns Data frame of pathway categories for given species
 #' @export
 #'
+#' @examplesIf interactive() && curl::has_internet()
+#' # Get pathway categories for species 99 (Indian Cobra)
+#' categories <- path_categories(species_id = 99)
+#' head(categories)
+#'
 path_categories <- function(species_id = NULL){
 
     # Check for species
@@ -17,14 +22,13 @@ path_categories <- function(species_id = NULL){
     }
 
     conn <- connect_database(species_id = species_id)
+    on.exit(DBI::dbDisconnect(conn))
 
     # Query unique categories
     cats <- DBI::dbGetQuery(
         conn,
         statement = "select distinct category from pathway;"
         )
-
-    DBI::dbDisconnect(conn)
 
     if (is.null(cats)){
         stop("No categories found for pathways of given species")

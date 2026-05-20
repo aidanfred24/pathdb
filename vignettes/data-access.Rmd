@@ -12,6 +12,7 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>"
 )
+options(rmarkdown.html_vignette.check_title = FALSE)
 ```
 
 ```{r setup}
@@ -28,11 +29,11 @@ In current research scenarios, it is common to work with RNA-Seq counts data. Th
 head(hypoxia_reads)
 ```
 
-## The `search_species` function
+## The `search_species()` function
 
 When considering Differential Expression and Pathway Analysis as methods for research, it may first be best for a researcher to convert the gene IDs of their data to the standard Ensembl or STRINGdb format. The SDSU database is great for this use case, but first we need to know: Does the database contain our species?
 
-To answer this and discover how we can identify our species in the database, we use the `search_species` function.
+To answer this and discover how we can identify our species in the database, we use the `search_species()` function.
 
 ```{r search_species, eval = FALSE}
 srch_results <- search_species(
@@ -95,11 +96,11 @@ search_species(
 pathdb:::human_id
 ```
 
-The most important piece of information to retain from the data returned by `search_species` is the `id` column. This is how many functions in this package will know which species to use for their operations.
+The most important piece of information to retain from the data returned by `search_species()` is the `id` column. This is how many functions in this package will know which species to use for their operations.
 
 ## Exploring Species Data Tables
 
-Now that we know our species ID is 96, we might want to discover what specific data and metadata is available for this species within the database. The `list_tables` function allows us to see all the tables present for a given species.
+Now that we know our species ID is 96, we might want to discover what specific data and metadata is available for this species within the database. The `list_tables()` function allows us to see all the tables present for a given species.
 
 ```{r list_tables, eval=FALSE}
 table_names <- list_tables(species_id = 96)
@@ -111,7 +112,7 @@ table_names
 pathdb:::human_tables
 ```
 
-Once we have identified a table of interest, we can retrieve its contents using the `get_table` function. For instance, we can fetch the "geneInfo" table, which contains important gene metadata like chromosomes, start positions, GC content, Ensembl IDs, and more. 
+Once we have identified a table of interest, we can retrieve its contents using the `get_table()` function. For instance, we can fetch the "geneInfo" table, which contains important gene metadata like chromosomes, start positions, GC content, Ensembl IDs, and more. 
 
 ```{r get_table, eval=FALSE}
 gene_info <- get_table(
@@ -126,7 +127,7 @@ head(gene_info[, 1:5])
 head(pathdb:::human_genes[, 1:5])
 ```
 
-The functions `get_genes` and `get_pathways` can also be used to obtain gene metadata and pathway information relative to the list of genes being studied. Below we use the genes from our `hypoxia_reads` data to do so. Note that these functions rely on Ensembl ID conversions from `convert_id`, discussed later in this vignette.
+The functions `get_genes()` and `get_pathways()` can also be used to obtain gene metadata and pathway information relative to the list of genes being studied. Below we use the genes from our `hypoxia_reads` data to do so. Note that these functions rely on Ensembl ID conversions from `convert_id()`, discussed later in this vignette.
 
 ```{r gene_info, eval=FALSE}
 gene_info <- get_genes(
@@ -141,7 +142,7 @@ head(gene_info[, 1:5])
 head(pathdb:::hypoxia_genes[, 1:5])
 ```
 
-When retrieving pathway information, it is important to know which pathway databases (e.g. KEGG, GOBP, GOCC, etc.) are available for the species of interest. For this, we may use `path_categories`.
+When retrieving pathway information, it is important to know which pathway databases (e.g. KEGG, GOBP, GOCC, etc.) are available for the species of interest. For this, we may use `path_categories()`.
 
 ```{r get_categories, eval = FALSE}
 categories <- path_categories(species_id = 96)
@@ -161,7 +162,7 @@ nrow(categories)
 nrow(pathdb:::categories)
 ```
 
-We see here that the human species has 140 different pathway databases. To retrieve all pathways from all databases would be very inefficient. We speed up this process by using the `category` argument in `get_pathways` to filter to specific pathway databases. This argument can be a character vector or only a single string. This feature of `pathdb` is especially versatile, as one can use a vector of pathway database names, e.g. `c("KEGG", "GOBP", "GOCC")`. In this way, we can check databases in one function call, rather than pulling from KEGG, GO, and other databases separately.
+We see here that the human species has 140 different pathway databases. To retrieve all pathways from all databases would be very inefficient. We speed up this process by using the `category` argument in `get_pathways()` to filter to specific pathway databases. This argument can be a character vector or only a single string. This feature of `pathdb` is especially versatile, as one can use a vector of pathway database names, e.g. `c("KEGG", "GOBP", "GOCC")`. In this way, we can check databases in one function call, rather than pulling from KEGG, GO, and other databases separately.
 
 Now we may obtain the specific set of pathways relative to the genes in our hypoxia data.
 
@@ -182,9 +183,9 @@ head(pathdb:::hypoxia_paths)
 
 ## Converting/Filtering Genes
 
-Once we have identified the correct species ID for our data (in this case, our ID is 96), we can use the `convert_id` function to standardize our gene IDs. This step is crucial for matching the gene names in SDSU's database, allowing us to retrieve pathway information for our genes and proceed to further analysis.
+Once we have identified the correct species ID for our data (in this case, our ID is 96), we can use the `convert_id()` function to standardize our gene IDs. This step is crucial for matching the gene names in SDSU's database, allowing us to retrieve pathway information for our genes and proceed to further analysis.
 
-If we only provide a vector of gene names to `convert_id`, it will return a table mapping our original IDs to the standard Ensembl format. If we also provide the raw data frame, it will return the data frame with Ensemble gene names substituted, automatically filtering out genes that cannot be mapped. 
+If we only provide a vector of gene names to `convert_id()`, it will return a table mapping our original IDs to the standard Ensembl format. If we also provide the raw data frame, it will return the data frame with Ensemble gene names substituted, automatically filtering out genes that cannot be mapped. 
 
 ```{r conv_vector, eval=FALSE}
 head(rownames(hypoxia_reads))
@@ -224,7 +225,7 @@ Please note that, if our genes cannot be mapped to Ensembl IDs, we can lose larg
 
 After standardizing our gene IDs, the next step prior to analysis is typically to clean our count data. This involves handling any missing values, filtering out genes with consistently low expression across samples, and potentially applying transformations to our count data, making it more suited for further exploratory or differential analysis.
 
-The `process_data` function provides a compact way to complete these steps in our analysis. It can impute missing values using methods like `"geneMedian"` or `"treatAsZero"`, filter genes based on Counts Per Million (CPM), and apply normalizations such as base-2 log, Variance Stabilizing Transformation (VST), or Regularized Log (rlog). Note that if the given data contains a column of gene IDs, that column will be stored as the rownames of the processed data.
+The `process_data()` function provides a compact way to complete these steps in our analysis. It can impute missing values using methods like `"geneMedian"` or `"treatAsZero"`, filter genes based on Counts Per Million (CPM), and apply normalizations such as base-2 log, Variance Stabilizing Transformation (VST), or Regularized Log (rlog). Note that if the given data contains a column of gene IDs, that column will be stored as the rownames of the processed data.
 
 Here is an example of processing the converted Human data using the default settings, which include imputing missing values with the overall gene median, filtering for genes with at least 0.5 CPM in at least 1 sample, and returning the raw counts without transformation.
 
@@ -235,8 +236,7 @@ processed_data <- process_data(
   data = hypoxia_conv,
   missing_value = "geneMedian",
   min_cpm = 0.5,
-  n_min_samples_count = 1,
-  counts_transform = 0
+  n_min_samples = 1
 )
 
 nrow(processed_data)

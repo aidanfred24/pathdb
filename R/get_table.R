@@ -13,9 +13,19 @@
 #' @seealso \code{\link{list_tables}} to see available tables for a species.
 #' @md
 #' @export
+#'
+#' @examplesIf interactive() && curl::has_internet()
+#' # Retrieve geneInfo table for Indian Cobra Species
+#' cobra_genes <- get_table(species_id = 99,
+#'                          table = "geneInfo")
+#'
+#' # View table
+#' head(cobra_genes)
+#'
 get_table <- function(species_id = NULL,
                       table = NULL){
     conn <- connect_database(species_id)
+    on.exit(DBI::dbDisconnect(conn = conn))
 
     if(is.null(table) && !is.null(species_id)) {
         table <- "geneInfo"
@@ -32,8 +42,6 @@ get_table <- function(species_id = NULL,
         conn = conn,
         statement = paste0("select * from ", table, ";")
     )
-
-    DBI::dbDisconnect(conn = conn)
 
     return(x)
 }
