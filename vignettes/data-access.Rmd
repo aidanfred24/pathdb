@@ -225,7 +225,7 @@ Please note that, if our genes cannot be mapped to Ensembl IDs, we can lose larg
 
 After standardizing our gene IDs, the next step prior to analysis is typically to clean our count data. This involves handling any missing values, filtering out genes with consistently low expression across samples, and potentially applying transformations to our count data, making it more suited for further exploratory or differential analysis.
 
-The `process_data()` function provides a compact way to complete these steps in our analysis. It can impute missing values using methods like `"geneMedian"` or `"treatAsZero"`, filter genes based on Counts Per Million (CPM), and apply normalizations such as base-2 log, Variance Stabilizing Transformation (VST), or Regularized Log (rlog). Note that if the given data contains a column of gene IDs, that column will be stored as the rownames of the processed data.
+The `process_data()` function provides a compact way to complete these steps in our analysis. It can impute missing values using methods like `"geneMedian"` or `"treatAsZero"` and filter genes based on Counts Per Million (CPM). Note that if the given data contains a column of gene IDs, that column will be stored as the rownames of the processed data.
 
 Here is an example of processing the converted Human data using the default settings, which include imputing missing values with the overall gene median, filtering for genes with at least 0.5 CPM in at least 1 sample, and returning the raw counts without transformation.
 

@@ -18,7 +18,7 @@ remotes::install_github("aidanfred24/pathdb")
 - **Centralized Database Access**: Connect directly to the SDSU bioinformatics database to fetch comprehensive gene and pathway data.
 - **Species Identification**: Quickly determine if your organism of interest is supported using various search queries (common names, scientific names).
 - **ID Standardization**: Convert gene identifiers into standard Ensembl formats to ensure compatibility with differential expression or pathway enrichment analysis tools.
-- **Data Pre-processing**: Clean and transform raw RNA-Seq count matrices (e.g., handling missing values, filtering low counts, applying VST/rlog transformations) for differential expression analysis.
+- **Data Pre-processing**: Clean and transform raw RNA-Seq count matrices (e.g., handling missing values, filtering low counts, etc.) for differential expression analysis.
 
 ## Quick Overview
 
@@ -44,7 +44,6 @@ processed_data <- process_data(
   data = clean_data,
   missing_value = "geneMedian",
   min_cpm = 0.5,
-  counts_transform = 0 # 0 returns raw counts, 1=log2(CPM), 2=VST, 3=rlog
 )
 
 # 4. Retrieve pathways for your genes of interest
