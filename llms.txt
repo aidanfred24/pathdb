@@ -30,9 +30,8 @@ remotes::install_github("aidanfred24/pathdb")
   formats to ensure compatibility with differential expression or
   pathway enrichment analysis tools.
 - **Data Pre-processing**: Clean and transform raw RNA-Seq count
-  matrices (e.g., handling missing values, filtering low counts,
-  applying VST/rlog transformations) for differential expression
-  analysis.
+  matrices (e.g., handling missing values, filtering low counts, etc.)
+  for differential expression analysis.
 
 ## Quick Overview
 
@@ -62,7 +61,6 @@ processed_data <- process_data(
   data = clean_data,
   missing_value = "geneMedian",
   min_cpm = 0.5,
-  counts_transform = 0 # 0 returns raw counts, 1=log2(CPM), 2=VST, 3=rlog
 )
 
 # 4. Retrieve pathways for your genes of interest

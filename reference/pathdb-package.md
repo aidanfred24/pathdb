@@ -8,7 +8,8 @@ and many more pathway databases. Also provides various helper functions
 for processing RNA-Seq data for differential expression analysis and
 pathway enrichment analysis, occasionally sourced from code from iDEP,
 developed by Ge, S.X., Son, E.W. & Yao, R. (2018)
-<https://doi.org/10.1186/s12859-018-2486-6>.
+[doi:10.1186/s12859-018-2486-6](https://doi.org/10.1186/s12859-018-2486-6)
+.
 
 ## See also
 

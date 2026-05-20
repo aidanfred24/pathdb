@@ -402,11 +402,9 @@ The
 [`process_data()`](https://aidanfred24.github.io/pathdb/reference/process_data.md)
 function provides a compact way to complete these steps in our analysis.
 It can impute missing values using methods like `"geneMedian"` or
-`"treatAsZero"`, filter genes based on Counts Per Million (CPM), and
-apply normalizations such as base-2 log, Variance Stabilizing
-Transformation (VST), or Regularized Log (rlog). Note that if the given
-data contains a column of gene IDs, that column will be stored as the
-rownames of the processed data.
+`"treatAsZero"` and filter genes based on Counts Per Million (CPM). Note
+that if the given data contains a column of gene IDs, that column will
+be stored as the rownames of the processed data.
 
 Here is an example of processing the converted Human data using the
 default settings, which include imputing missing values with the overall

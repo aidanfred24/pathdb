@@ -458,12 +458,10 @@ making it more suited for further exploratory or differential
 analysis.</p>
 <p>The <code><a href="../reference/process_data.html">process_data()</a></code> function provides a compact way to
 complete these steps in our analysis. It can impute missing values using
-methods like <code>"geneMedian"</code> or <code>"treatAsZero"</code>,
-filter genes based on Counts Per Million (CPM), and apply normalizations
-such as base-2 log, Variance Stabilizing Transformation (VST), or
-Regularized Log (rlog). Note that if the given data contains a column of
-gene IDs, that column will be stored as the rownames of the processed
-data.</p>
+methods like <code>"geneMedian"</code> or <code>"treatAsZero"</code> and
+filter genes based on Counts Per Million (CPM). Note that if the given
+data contains a column of gene IDs, that column will be stored as the
+rownames of the processed data.</p>
 <p>Here is an example of processing the converted Human data using the
 default settings, which include imputing missing values with the overall
 gene median, filtering for genes with at least 0.5 CPM in at least 1
