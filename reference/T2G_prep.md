@@ -32,3 +32,21 @@ T2G_prep(species_id = NULL, category = "GOBP", genes = NULL)
 ## Value
 
 A data frame containing TERM2GENE Data (pathways to genes)
+
+## Examples
+
+``` r
+if (FALSE) { # interactive() && curl::has_internet()
+# CAUTION: The human database is very large, running these examples require
+# the download of the human database.
+
+# Prepare background genes mapping for Hypoxia dataset
+# Useful for pathway enrichment analysis of our data
+bg_genes <- T2G_prep(
+  species_id = 96,
+  category = "KEGG",
+  genes = rownames(hypoxia_deseq)
+)
+head(bg_genes)
+}
+```

@@ -35,7 +35,7 @@ pathway ID, and description) for the specified categories and genes.
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
+if (FALSE) { # interactive() && curl::has_internet()
 # Get all GO Biological Process pathways for Human (ID 96)
 gobp_paths <- path_filter(species_id = 96, category = "GOBP")
 
@@ -46,5 +46,5 @@ kegg_paths <- path_filter(
     genes = rownames(hypoxia_reads)[1:100],
     category = "KEGG"
 )
-} # }
+}
 ```

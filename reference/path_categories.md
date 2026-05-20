@@ -19,3 +19,13 @@ path_categories(species_id = NULL)
 ## Value
 
 Data frame of pathway categories for given species
+
+## Examples
+
+``` r
+if (FALSE) { # interactive() && curl::has_internet()
+# Get pathway categories for species 99 (Indian Cobra)
+categories <- path_categories(species_id = 99)
+head(categories)
+}
+```

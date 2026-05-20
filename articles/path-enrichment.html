@@ -12,8 +12,8 @@
 <link rel="icon" sizes="any" href="../favicon.ico">
 <link rel="manifest" href="../site.webmanifest">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
-<script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
+<link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
+<script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
 <script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Pathway Enrichment Analysis">
 </head>
@@ -129,8 +129,9 @@ adjusted p-value of less than 0.05.</p>
 <span><span class="co"># Filter out non-significant or missing adjusted p-value genes</span></span>
 <span><span class="va">df</span> <span class="op">&lt;-</span> <span class="va">df</span><span class="op">[</span><span class="va">df</span><span class="op">$</span><span class="va">diffexp</span> <span class="op">!=</span> <span class="st">"NO"</span> <span class="op">&amp;</span> <span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/NA.html" class="external-link">is.na</a></span><span class="op">(</span><span class="va">df</span><span class="op">$</span><span class="va">diffexp</span><span class="op">)</span>, <span class="op">]</span></span></code></pre></div>
 <p>Next, to ensure our gene IDs match the standard format expected by
-the <code>pathdb</code> database, we can use the <code>convert_id</code>
-function. Here our species of interest is human (Species ID: 96).</p>
+the <code>pathdb</code> database, we can use the
+<code><a href="../reference/convert_id.html">convert_id()</a></code> function. Here our species of interest is
+human (Species ID: 96).</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Convert ids to Ensembl format to ensure compatibility</span></span>
 <span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/convert_id.html">convert_id</a></span><span class="op">(</span></span>
@@ -150,7 +151,8 @@ genes separately, we split our data frame into a list.</p>
 <p>The <code>clusterProfiler</code> function <code>enricher</code>
 requires background annotation data that maps pathway categories (TERMs)
 to gene IDs (GENEs). With the <code>pathdb</code> package, fetching this
-information is streamlined using the <code>T2G_prep</code> function.</p>
+information is streamlined using the <code><a href="../reference/T2G_prep.html">T2G_prep()</a></code>
+function.</p>
 <p>We will extract the KEGG pathways mapping for all the genes in our
 original <code>hypoxia_deseq</code> dataset, which acts as our
 background universe. This feature of <code>pathdb</code> is especially
@@ -173,7 +175,7 @@ an Over-Representation Analysis (ORA). ORA determines whether known
 pathways (biological functions or processes) are over-represented
 (enriched) in an experimentally-derived gene list, such as our lists of
 up- and down-regulated genes.</p>
-<p>We apply the <code>enricher</code> function to both the “UP” and
+<p>We apply the <code><a href="https://rdrr.io/pkg/clusterProfiler/man/enricher.html" class="external-link">enricher()</a></code> function to both the “UP” and
 “DOWN” gene lists. We also set some cutoffs to ensure our results are
 robust.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
@@ -260,7 +262,7 @@ level. However, a simpler metric is often the
 <span><span class="co"># Order the list from highest to lowest</span></span>
 <span><span class="va">geneList</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sort.html" class="external-link">sort</a></span><span class="op">(</span><span class="va">geneList</span>, decreasing <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p>With the ranked <code>geneList</code>, we can run the
-<code>GSEA</code> function from clusterProfiler. We will utilize the
+<code><a href="https://rdrr.io/pkg/clusterProfiler/man/GSEA.html" class="external-link">GSEA()</a></code> function from clusterProfiler. We will utilize the
 same background mapping (<code>bg_genes</code>) downloaded earlier.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Execute GSEA</span></span>

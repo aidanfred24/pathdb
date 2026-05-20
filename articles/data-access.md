@@ -39,7 +39,7 @@ head(hypoxia_reads)
 #> A3GALT2                    1
 ```
 
-## The `search_species` function
+## The `search_species()` function
 
 When considering Differential Expression and Pathway Analysis as methods
 for research, it may first be best for a researcher to convert the gene
@@ -48,7 +48,9 @@ database is great for this use case, but first we need to know: Does the
 database contain our species?
 
 To answer this and discover how we can identify our species in the
-database, we use the `search_species` function.
+database, we use the
+[`search_species()`](https://aidanfred24.github.io/pathdb/reference/search_species.md)
+function.
 
 ``` r
 
@@ -160,15 +162,18 @@ search_species(
     #> 1   T01001   1
 
 The most important piece of information to retain from the data returned
-by `search_species` is the `id` column. This is how many functions in
-this package will know which species to use for their operations.
+by
+[`search_species()`](https://aidanfred24.github.io/pathdb/reference/search_species.md)
+is the `id` column. This is how many functions in this package will know
+which species to use for their operations.
 
 ## Exploring Species Data Tables
 
 Now that we know our species ID is 96, we might want to discover what
 specific data and metadata is available for this species within the
-database. The `list_tables` function allows us to see all the tables
-present for a given species.
+database. The
+[`list_tables()`](https://aidanfred24.github.io/pathdb/reference/list_tables.md)
+function allows us to see all the tables present for a given species.
 
 ``` r
 
@@ -181,9 +186,11 @@ table_names
     #> [6] "pathwayInfo" "source"
 
 Once we have identified a table of interest, we can retrieve its
-contents using the `get_table` function. For instance, we can fetch the
-“geneInfo” table, which contains important gene metadata like
-chromosomes, start positions, GC content, Ensembl IDs, and more.
+contents using the
+[`get_table()`](https://aidanfred24.github.io/pathdb/reference/get_table.md)
+function. For instance, we can fetch the “geneInfo” table, which
+contains important gene metadata like chromosomes, start positions, GC
+content, Ensembl IDs, and more.
 
 ``` r
 
@@ -203,11 +210,16 @@ head(gene_info[, 1:5])
     #> 5 ENSG00000000460  q24.2               1      169662007                 39.22
     #> 6 ENSG00000000938  p35.3               1       27612064                 52.92
 
-The functions `get_genes` and `get_pathways` can also be used to obtain
-gene metadata and pathway information relative to the list of genes
-being studied. Below we use the genes from our `hypoxia_reads` data to
-do so. Note that these functions rely on Ensembl ID conversions from
-`convert_id`, discussed later in this vignette.
+The functions
+[`get_genes()`](https://aidanfred24.github.io/pathdb/reference/get_genes.md)
+and
+[`get_pathways()`](https://aidanfred24.github.io/pathdb/reference/get_pathways.md)
+can also be used to obtain gene metadata and pathway information
+relative to the list of genes being studied. Below we use the genes from
+our `hypoxia_reads` data to do so. Note that these functions rely on
+Ensembl ID conversions from
+[`convert_id()`](https://aidanfred24.github.io/pathdb/reference/convert_id.md),
+discussed later in this vignette.
 
 ``` r
 
@@ -236,7 +248,8 @@ head(gene_info[, 1:5])
 
 When retrieving pathway information, it is important to know which
 pathway databases (e.g. KEGG, GOBP, GOCC, etc.) are available for the
-species of interest. For this, we may use `path_categories`.
+species of interest. For this, we may use
+[`path_categories()`](https://aidanfred24.github.io/pathdb/reference/path_categories.md).
 
 ``` r
 
@@ -263,12 +276,13 @@ nrow(categories)
 We see here that the human species has 140 different pathway databases.
 To retrieve all pathways from all databases would be very inefficient.
 We speed up this process by using the `category` argument in
-`get_pathways` to filter to specific pathway databases. This argument
-can be a character vector or only a single string. This feature of
-`pathdb` is especially versatile, as one can use a vector of pathway
-database names, e.g. `c("KEGG", "GOBP", "GOCC")`. In this way, we can
-check databases in one function call, rather than pulling from KEGG, GO,
-and other databases separately.
+[`get_pathways()`](https://aidanfred24.github.io/pathdb/reference/get_pathways.md)
+to filter to specific pathway databases. This argument can be a
+character vector or only a single string. This feature of `pathdb` is
+especially versatile, as one can use a vector of pathway database names,
+e.g. `c("KEGG", "GOBP", "GOCC")`. In this way, we can check databases in
+one function call, rather than pulling from KEGG, GO, and other
+databases separately.
 
 Now we may obtain the specific set of pathways relative to the genes in
 our hypoxia data.
@@ -316,16 +330,18 @@ head(path_info)
 ## Converting/Filtering Genes
 
 Once we have identified the correct species ID for our data (in this
-case, our ID is 96), we can use the `convert_id` function to standardize
-our gene IDs. This step is crucial for matching the gene names in SDSU’s
-database, allowing us to retrieve pathway information for our genes and
-proceed to further analysis.
+case, our ID is 96), we can use the
+[`convert_id()`](https://aidanfred24.github.io/pathdb/reference/convert_id.md)
+function to standardize our gene IDs. This step is crucial for matching
+the gene names in SDSU’s database, allowing us to retrieve pathway
+information for our genes and proceed to further analysis.
 
-If we only provide a vector of gene names to `convert_id`, it will
-return a table mapping our original IDs to the standard Ensembl format.
-If we also provide the raw data frame, it will return the data frame
-with Ensemble gene names substituted, automatically filtering out genes
-that cannot be mapped.
+If we only provide a vector of gene names to
+[`convert_id()`](https://aidanfred24.github.io/pathdb/reference/convert_id.md),
+it will return a table mapping our original IDs to the standard Ensembl
+format. If we also provide the raw data frame, it will return the data
+frame with Ensemble gene names substituted, automatically filtering out
+genes that cannot be mapped.
 
 ``` r
 
@@ -382,13 +398,15 @@ values, filtering out genes with consistently low expression across
 samples, and potentially applying transformations to our count data,
 making it more suited for further exploratory or differential analysis.
 
-The `process_data` function provides a compact way to complete these
-steps in our analysis. It can impute missing values using methods like
-`"geneMedian"` or `"treatAsZero"`, filter genes based on Counts Per
-Million (CPM), and apply normalizations such as base-2 log, Variance
-Stabilizing Transformation (VST), or Regularized Log (rlog). Note that
-if the given data contains a column of gene IDs, that column will be
-stored as the rownames of the processed data.
+The
+[`process_data()`](https://aidanfred24.github.io/pathdb/reference/process_data.md)
+function provides a compact way to complete these steps in our analysis.
+It can impute missing values using methods like `"geneMedian"` or
+`"treatAsZero"`, filter genes based on Counts Per Million (CPM), and
+apply normalizations such as base-2 log, Variance Stabilizing
+Transformation (VST), or Regularized Log (rlog). Note that if the given
+data contains a column of gene IDs, that column will be stored as the
+rownames of the processed data.
 
 Here is an example of processing the converted Human data using the
 default settings, which include imputing missing values with the overall
@@ -404,8 +422,7 @@ processed_data <- process_data(
   data = hypoxia_conv,
   missing_value = "geneMedian",
   min_cpm = 0.5,
-  n_min_samples_count = 1,
-  counts_transform = 0
+  n_min_samples = 1
 )
 
 nrow(processed_data)

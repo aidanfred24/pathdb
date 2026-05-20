@@ -18,3 +18,12 @@ list_tables(species_id = NULL)
 ## Value
 
 A character vector of table names available in the database connection.
+
+## Examples
+
+``` r
+if (FALSE) { # interactive() && curl::has_internet()
+# List all tables available for species 99 (Indian Cobra)
+list_tables(species_id = 99)
+}
+```

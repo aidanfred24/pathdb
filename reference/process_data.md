@@ -10,9 +10,8 @@ process_data(
   data,
   missing_value = "geneMedian",
   min_cpm = 0.5,
-  n_min_samples_count = 1,
-  counts_transform = 0,
-  counts_log_start = 4
+  n_min_samples = 1,
+  rescale = FALSE
 )
 ```
 
@@ -20,7 +19,8 @@ process_data(
 
 - data:
 
-  A numeric matrix or data frame of gene expression counts.
+  A numeric matrix or data frame (\> 1 columns) of gene expression
+  counts.
 
 - missing_value:
 
@@ -38,28 +38,14 @@ process_data(
 
   Numeric. Minimum counts per million threshold for filtering genes.
 
-- n_min_samples_count:
+- n_min_samples:
 
   Numeric. Minimum number of samples that must meet the `min_cpm`
   threshold for a gene to be retained.
 
-- counts_transform:
+- rescale:
 
-  Integer. Method for data transformation:
-
-  - 0 = None (Raw Counts).
-
-  - 1 = log2(CPM + `counts_log_start`)
-
-  - 2 = Variance Stabilizing Transformation (VST) via `DESeq2`.
-
-  - 3 = Regularized Log (rlog) via `DESeq2`.
-
-- counts_log_start:
-
-  Numeric. Constant added to counts before log transformation. Usually
-  between 1 and 10. Higher values reduce noise but decrease sensitivity
-  (used when `counts_transform = 1`).
+  Logical. TRUE allows for rescaling if values are exceedingly large.
 
 ## Value
 
@@ -97,8 +83,7 @@ nrow(pathdb::hypoxia_reads)
 hypox_filtered <- process_data(data = pathdb::hypoxia_reads,
                                missing_value = "geneMedian",
                                min_cpm = 0.4,
-                               n_min_samples_count = 2,
-                               counts_transform = 0)
+                               n_min_samples = 2)
 
 # Check filtered data
 summary(hypox_filtered)

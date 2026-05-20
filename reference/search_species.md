@@ -30,3 +30,21 @@ search_species(query, name_type = "all")
 
 A data frame containing information for all matching species. Throws an
 error if no species are found.
+
+## Examples
+
+``` r
+if (FALSE) { # interactive() && curl::has_internet()
+# Search all names for "Human"
+search_species(query = "Human", name_type = "all")
+
+# Search primary names for "Human"
+search_species(query = "Human", name_type = "primary")
+
+# Search academic names for "Homo sapiens"
+search_species(query = "Homo sapiens", name_type = "academic")
+
+# Search by species ID
+search_species(query = 96, name_type = "id")
+}
+```

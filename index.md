@@ -86,5 +86,5 @@ please refer to the package vignettes:
 ## Requirements
 
 - R \>= 4.1.0
-- **Imports**: `RSQLite`, `DESeq2`, `edgeR`, `dplyr`,
-  `SummarizedExperiment`, `BiocGenerics`, `R.utils`
+- **Imports**: `DBI`, `dplyr`, `edgeR`, `R.utils`, `RSQLite`, `stats`,
+  `utils`, `tools`

@@ -66,8 +66,9 @@ df <- df[df$diffexp != "NO" & !is.na(df$diffexp), ]
 ```
 
 Next, to ensure our gene IDs match the standard format expected by the
-`pathdb` database, we can use the `convert_id` function. Here our
-species of interest is human (Species ID: 96).
+`pathdb` database, we can use the
+[`convert_id()`](https://aidanfred24.github.io/pathdb/reference/convert_id.md)
+function. Here our species of interest is human (Species ID: 96).
 
 ``` r
 
@@ -93,7 +94,8 @@ deg_results_list <- split(df, df$diffexp)
 The `clusterProfiler` function `enricher` requires background annotation
 data that maps pathway categories (TERMs) to gene IDs (GENEs). With the
 `pathdb` package, fetching this information is streamlined using the
-`T2G_prep` function.
+[`T2G_prep()`](https://aidanfred24.github.io/pathdb/reference/T2G_prep.md)
+function.
 
 We will extract the KEGG pathways mapping for all the genes in our
 original `hypoxia_deseq` dataset, which acts as our background universe.
@@ -119,8 +121,10 @@ pathways (biological functions or processes) are over-represented
 (enriched) in an experimentally-derived gene list, such as our lists of
 up- and down-regulated genes.
 
-We apply the `enricher` function to both the “UP” and “DOWN” gene lists.
-We also set some cutoffs to ensure our results are robust.
+We apply the
+[`enricher()`](https://rdrr.io/pkg/clusterProfiler/man/enricher.html)
+function to both the “UP” and “DOWN” gene lists. We also set some
+cutoffs to ensure our results are robust.
 
 ``` r
 
@@ -213,8 +217,9 @@ geneList <- setNames(
 geneList <- sort(geneList, decreasing = TRUE)
 ```
 
-With the ranked `geneList`, we can run the `GSEA` function from
-clusterProfiler. We will utilize the same background mapping
+With the ranked `geneList`, we can run the
+[`GSEA()`](https://rdrr.io/pkg/clusterProfiler/man/GSEA.html) function
+from clusterProfiler. We will utilize the same background mapping
 (`bg_genes`) downloaded earlier.
 
 ``` r

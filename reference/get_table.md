@@ -29,3 +29,16 @@ A data frame containing the data from the selected table.
 
 [`list_tables`](https://aidanfred24.github.io/pathdb/reference/list_tables.md)
 to see available tables for a species.
+
+## Examples
+
+``` r
+if (FALSE) { # interactive() && curl::has_internet()
+# Retrieve geneInfo table for Indian Cobra Species
+cobra_genes <- get_table(species_id = 99,
+                         table = "geneInfo")
+
+# View table
+head(cobra_genes)
+}
+```

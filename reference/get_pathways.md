@@ -39,3 +39,20 @@ The function first retrieves the `pathway` and `pathwayInfo` tables for
 the specified species. If a list of genes is provided, it converts the
 IDs to Ensembl IDs, matches them against the pathway map, and joins the
 results with pathway metadata.
+
+## Examples
+
+``` r
+if (FALSE) { # interactive() && curl::has_internet()
+# CAUTION: The human database is very large, running these examples require
+# the download of the human database.
+
+# Get GOBP pathways for our genes of interest
+path_info <- get_pathways(
+  species_id = 96,
+  genes = rownames(hypoxia_reads),
+  category = "GOBP"
+)
+head(path_info)
+}
+```
