@@ -20,7 +20,7 @@ Useful links:
 
 }
 \author{
-\strong{Maintainer}: Aidan Frederick \email{aidanfred24@gmail.com}
+\strong{Maintainer}: Aidan Frederick \email{Aidan.Frederick@sdstate.edu}
 
 Other contributors:
 \itemize{
