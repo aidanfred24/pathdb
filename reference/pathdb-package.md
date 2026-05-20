@@ -22,7 +22,7 @@ Useful links:
 
 ## Author
 
-**Maintainer**: Aidan Frederick <aidanfred24@gmail.com>
+**Maintainer**: Aidan Frederick <Aidan.Frederick@sdstate.edu>
 
 Other contributors:
 
