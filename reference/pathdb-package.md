@@ -6,8 +6,9 @@ analysis of over 13,000 organisms. It includes various gene mappings,
 gene characteristics, and pathway mapping data from KEGG, GOBP, GOCC,
 and many more pathway databases. Also provides various helper functions
 for processing RNA-Seq data for differential expression analysis and
-pathway enrichment analysis, occasionally sourced from code from iDEP,
-developed by Ge, S.X., Son, E.W. & Yao, R. (2018)
+pathway enrichment analysis, occasionally sourced from code from
+Integrated Differential Expression & Pathway analysis (iDEP), developed
+by Ge, S.X., Son, E.W. & Yao, R. (2018)
 [doi:10.1186/s12859-018-2486-6](https://doi.org/10.1186/s12859-018-2486-6)
 .
 
