@@ -41,6 +41,9 @@ connect_database <- function(species_id = NULL){
     db_ver <- "data113"
     db_url <- "https://bioinformatics.sdstate.edu/data/"
 
+    # Store old user timeout (for CRAN)
+    old_opts <- getOption("timeout")
+
     # if environmental variable is not set, use relative path
     DATAPATH <- Sys.getenv("IDEP_DATABASE")[1]
     # if not defined in the environment, use user directory
@@ -65,7 +68,11 @@ connect_database <- function(species_id = NULL){
         dir.create(temp)
 
         file_name <- paste0(db_ver, ".tar.gz")
+
+        # Set timeout to 3000, revert on exit
         options(timeout = 3000)
+        on.exit(options(timeout = old_opts))
+
         # Attempt to download, warn if unable
         tryCatch(
             suppressWarnings(
@@ -130,7 +137,11 @@ connect_database <- function(species_id = NULL){
 
         if (!file.exists(db_file)) {
             file_name <- paste0(file, ".gz")
+
+            # Set timeout to 3000, revert on exit
             options(timeout = 3000)
+            on.exit(options(timeout = old_opts))
+
             # Attempt to download, warn if unable
             tryCatch(
                 suppressWarnings(
