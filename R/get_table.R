@@ -24,9 +24,6 @@
 #'
 get_table <- function(species_id = NULL,
                       table = NULL){
-    conn <- connect_database(species_id)
-    on.exit(DBI::dbDisconnect(conn = conn))
-
     if(is.null(table) && !is.null(species_id)) {
         table <- "geneInfo"
         message("No table provided, using geneInfo by default")
@@ -36,6 +33,9 @@ get_table <- function(species_id = NULL,
     } else if (!is.character(table)){
         stop("Table selection must be character type")
     }
+
+    conn <- connect_database(species_id)
+    on.exit(DBI::dbDisconnect(conn = conn))
 
     # Retrieve table from database file
     x <- DBI::dbGetQuery(

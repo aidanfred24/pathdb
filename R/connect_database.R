@@ -56,6 +56,24 @@ connect_database <- function(species_id = NULL){
         dir.create(DATAPATH, recursive = TRUE)
     }
 
+    # Helper to notify user of installation path and size
+    notify_installation <- function(file_path) {
+        if (file.exists(file_path)) {
+            size_bytes <- file.info(file_path)$size
+            if (!is.null(size_bytes) && !is.na(size_bytes)) {
+                size_formatted <- if (size_bytes >= 1e6) {
+                    paste0(round(size_bytes / 1e6, 2), " MB")
+                } else if (size_bytes >= 1e3) {
+                    paste0(round(size_bytes / 1e3, 2), " KB")
+                } else {
+                    paste0(size_bytes, " bytes")
+                }
+                message("Installed database file: ", file_path,
+                        " (", size_formatted, ")")
+            }
+        }
+    }
+
     # Organism info file
     org_info_file <- paste0(DATAPATH, "/orgInfo.db")
     db_file <- org_info_file
@@ -108,6 +126,9 @@ connect_database <- function(species_id = NULL){
 
         # Remove temporary files
         unlink(temp, recursive = TRUE)
+
+        # Notify user of installation path and size
+        notify_installation(org_info_file)
     }
 
     # Specific species selected
@@ -166,6 +187,9 @@ connect_database <- function(species_id = NULL){
             # Unzip species database file
             R.utils::gunzip(filename = paste0(DATAPATH, "/", file_name),
                             destname = db_file)
+
+            # Notify user of installation path and size
+            notify_installation(db_file)
         }
     }
 
