@@ -22,6 +22,11 @@ Useful links:
 \author{
 \strong{Maintainer}: Aidan Frederick \email{Aidan.Frederick@sdstate.edu}
 
+Authors:
+\itemize{
+  \item Aidan Frederick \email{Aidan.Frederick@sdstate.edu}
+}
+
 Other contributors:
 \itemize{
   \item Xijin Ge \email{Xijin.Ge@sdstate.edu} [funder]
