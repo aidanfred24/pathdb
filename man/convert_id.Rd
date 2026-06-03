@@ -39,7 +39,10 @@ type. Returns \code{NULL} if \code{species_id} is missing or no matches are foun
 \description{
 Queries the database to map user-provided gene identifiers to Ensembl/Entrez
 IDs. To ensure best matching and conversion, please verify that all gene
-identifiers have no whitespace and are at least 2 characters long.
+identifiers have no whitespace and are at least 2 characters long. Results
+are often more conservative of initial genes if data is provided, as
+duplicate removal is done by variance of each gene
+(highest variance is kept).
 }
 \examples{
 \dontshow{if (interactive() && curl::has_internet()) withAutoprint(\{ # examplesIf}
