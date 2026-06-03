@@ -11,6 +11,7 @@
  * `convert_id` prints number of duplicate gene IDs detected and removed from the input data
  * `connect_database` now prints the path to the downloaded database file (in the package cache) and the size of the file
 
+
 # pathdb 0.1.0
 
 * Initial CRAN submission.

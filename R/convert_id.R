@@ -2,7 +2,10 @@
 #'
 #' Queries the database to map user-provided gene identifiers to Ensembl/Entrez
 #' IDs. To ensure best matching and conversion, please verify that all gene
-#' identifiers have no whitespace and are at least 2 characters long.
+#' identifiers have no whitespace and are at least 2 characters long. Results
+#' are often more conservative of initial genes if data is provided, as
+#' duplicate removal is done by variance of each gene
+#' (highest variance is kept).
 #'
 #' @param genes A vector or character string of gene identifiers to convert.
 #' @param data Optional data frame or matrix. If provided, the function attempts
@@ -76,7 +79,9 @@ convert_id <- function(genes,
 
     # Split genes by tabs, whitespace, newlines; take first element
     # nothing is preserved following whitespace
-    cl_genes <- sapply(strsplit(cl_genes, split = "[\t \n,]+"), function(x) x[1])
+    cl_genes <- sapply(strsplit(cl_genes,
+                                split = "[\t \n,]+"),
+                       function(x) x[1])
 
     # Make uppercase, trim any other whitespace
     cl_genes <- toupper(trimws(cl_genes))
@@ -108,7 +113,8 @@ convert_id <- function(genes,
         entrez_string <- paste0("('",
                                 paste(result$ens, collapse = "', '"),
                                 "')")
-        entrez_query <- paste0("select ensembl_gene_id, entrezgene_id from geneInfo where",
+        entrez_query <- paste0("select ensembl_gene_id, entrezgene_id from",
+                               " geneInfo where",
                                " ensembl_gene_id IN", entrez_string)
         entrez <- DBI::dbGetQuery(conn_db, entrez_query)
 
@@ -118,7 +124,7 @@ convert_id <- function(genes,
                         by.y = "ensembl_gene_id",
                         all.x = TRUE)
 
-        result <- result[!is.na(result$entrezgene_id),]
+        result <- result[!is.na(result$entrezgene_id), c(2,1,3,4)]
     }
 
     # resolve multiple ID types, get the most matched
@@ -132,28 +138,9 @@ convert_id <- function(genes,
     )
     result <- result[result$idType == best_id_type, ]
 
-    # Subject to change
-    # one to many, keep one ensembl id, randomly
-    # remove duplicates in query gene ids
-    result <- result[which(!duplicated(result[, 1])), ]
-
-    if (is.null(data) || is.null(dim(data))) {
-        cl_genes <- as.data.frame(cl_genes)
-        colnames(cl_genes)[1] <- "id"
-        if (id_type == "ens"){
-            result <- dplyr::left_join(
-                x = result[, 1:2],
-                y = cl_genes,
-                by = "id"
-            )
-        } else {
-            result <- dplyr::left_join(
-                x = result[, c(2,4)],
-                y = cl_genes,
-                by = "id"
-            )
-        }
-    } else {
+    # If data is provided, align it and compute variances early
+    has_data <- !is.null(data) && !is.null(dim(data))
+    if (has_data) {
         match_idx <- which(colSums(data == genes) == nrow(data))
         gene_col <- colnames(data)[match_idx]
 
@@ -168,12 +155,75 @@ convert_id <- function(genes,
         }
 
         # Remove entries with length 1
-        data <- data[valid_id,]
+        data <- data[valid_id, , drop = FALSE]
         # Replace gene column with cleaned gene IDs
         data[[gene_col]] <- cl_genes
 
+        # Calculate variance of each row
+        numeric_cols <- sapply(data, is.numeric)
+        if (any(numeric_cols)) {
+            row_vars <- apply(
+                data[, numeric_cols, drop = FALSE], 1,
+                function(x) {
+                    v <- stats::var(as.numeric(x), na.rm = TRUE)
+                    if (is.na(v)) {return(0)} else {return(v)}
+                }
+            )
+        } else {
+            row_vars <- rep(0, nrow(data))
+        }
+
+        # Create a lookup: gene ID -> variance
+        gene_vars <- data.frame(
+            id = cl_genes,
+            variance = row_vars,
+            stringsAsFactors = FALSE
+        )
+        # In case of duplicate gene IDs in cl_genes
+        # keep the one with max variance
+        gene_vars <- gene_vars[order(-gene_vars$variance), ]
+        gene_vars <- gene_vars[!duplicated(gene_vars$id), ]
+
+        # Associate each row of query results with its variance
+        result <- merge(result, gene_vars, by = "id", all.x = TRUE)
+        # Sort result by variance descending (NAs last)
+        result <- result[order(-result$variance, na.last = TRUE), ]
+    }
+
+    initial_rows <- nrow(result)
+
+    # Deduplicate query gene IDs
+    # (keep first, which has the highest variance if has_data)
+    result <- result[which(!duplicated(result$id)), ]
+
+    # Deduplicate target IDs
+    # (keep first, which has the highest variance if has_data)
+    target_col <- if (id_type == "ens") {"ens"} else {"entrezgene_id"}
+    if (sum(duplicated(result[[target_col]])) != 0) {
+        result <- result[which(!duplicated(result[[target_col]])), ]
+    }
+
+    removed_rows <- initial_rows - nrow(result)
+
+    if (!has_data) {
+        cl_genes <- as.data.frame(cl_genes)
+        colnames(cl_genes)[1] <- "id"
+        if (id_type == "ens"){
+            result <- dplyr::left_join(
+                x = result[, 1:2],
+                y = cl_genes,
+                by = "id"
+            )
+        } else {
+            result <- dplyr::left_join(
+                x = result[, c(1,4)],
+                y = cl_genes,
+                by = "id"
+            )
+        }
+    } else {
         if (id_type == "entrez"){
-            conversion_table <- result[,c(2,4)]
+            conversion_table <- result[,c(1,4)]
         } else {
             conversion_table <- result[,c(1,2)]
         }
@@ -197,6 +247,7 @@ convert_id <- function(genes,
         }
     }
 
+    message(paste(removed_rows, "duplicate gene mappings removed"))
     message(paste(nrow(result), "genes found with selected ID type"))
     return(result)
 }
