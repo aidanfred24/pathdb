@@ -26,6 +26,10 @@ Useful links:
 
 **Maintainer**: Aidan Frederick <Aidan.Frederick@sdstate.edu>
 
+Authors:
+
+- Aidan Frederick <Aidan.Frederick@sdstate.edu>
+
 Other contributors:
 
 - Xijin Ge <Xijin.Ge@sdstate.edu> \[funder\]

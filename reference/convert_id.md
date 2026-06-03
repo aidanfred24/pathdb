@@ -3,7 +3,9 @@
 Queries the database to map user-provided gene identifiers to
 Ensembl/Entrez IDs. To ensure best matching and conversion, please
 verify that all gene identifiers have no whitespace and are at least 2
-characters long.
+characters long. Results are often more conservative of initial genes if
+data is provided, as duplicate removal is done by variance of each gene
+(highest variance is kept).
 
 ## Usage
 
