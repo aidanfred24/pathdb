@@ -118,7 +118,7 @@ convert_id <- function(genes,
                         by.y = "ensembl_gene_id",
                         all.x = TRUE)
 
-        result <- result[!is.na(result$entrezgene_id),]
+        result <- result[!is.na(result$entrezgene_id), c(2,1,3,4)]
     }
 
     # resolve multiple ID types, get the most matched
@@ -135,7 +135,11 @@ convert_id <- function(genes,
     # Subject to change
     # one to many, keep one ensembl id, randomly
     # remove duplicates in query gene ids
-    result <- result[which(!duplicated(result[, 2])), ]
+    result <- result[which(!duplicated(result[, 1])), ]
+
+    if (id_type == "ens" & sum(duplicated(result[,2])) != 0){
+        result <- result[which(!duplicated(result[, 2])), ]
+    }
 
     if (is.null(data) || is.null(dim(data))) {
         cl_genes <- as.data.frame(cl_genes)
@@ -173,7 +177,7 @@ convert_id <- function(genes,
         data[[gene_col]] <- cl_genes
 
         if (id_type == "entrez"){
-            conversion_table <- result[,c(2,4)]
+            conversion_table <- result[,c(1,4)]
         } else {
             conversion_table <- result[,c(1,2)]
         }
