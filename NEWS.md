@@ -1,4 +1,4 @@
-# pathdb 0.2.0
+# pathdb (development version)
 
 ## Major Changes
 
