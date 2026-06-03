@@ -135,7 +135,7 @@ convert_id <- function(genes,
     # Subject to change
     # one to many, keep one ensembl id, randomly
     # remove duplicates in query gene ids
-    result <- result[which(!duplicated(result[, 1])), ]
+    result <- result[which(!duplicated(result[, 2])), ]
 
     if (is.null(data) || is.null(dim(data))) {
         cl_genes <- as.data.frame(cl_genes)
